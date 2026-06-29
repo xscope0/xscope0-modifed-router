@@ -14,8 +14,10 @@ const COLORS = {
   bgGreen: "\x1b[42m",
   bgBlue: "\x1b[44m",
   black: "\x1b[30m",
-  terracotta: "\x1b[38;2;217;119;87m",
-  bgTerracotta: "\x1b[48;2;217;119;87m"
+  redTeam: "\x1b[38;2;190;80;80m",
+  bgRedTeam: "\x1b[48;2;96;28;28m",
+  terracotta: "\x1b[38;2;190;80;80m",
+  bgTerracotta: "\x1b[48;2;96;28;28m"
 };
 
 // Prime stdin once globally. Toggling raw mode between menus adds latency on
@@ -101,10 +103,10 @@ async function selectMenu(title, items, defaultIndex = 0, subtitle = "", headerC
       if (!isActive) return;
       process.stdout.write("\x1b[2J\x1b[H");
       const width = Math.min(process.stdout.columns || 40, 40);
-      console.log(`\n${COLORS.terracotta}${"=".repeat(width)}${COLORS.reset}`);
-      console.log(`  ${COLORS.bright}${COLORS.terracotta}${title}${COLORS.reset}`);
+      console.log(`\n${COLORS.redTeam}${"=".repeat(width)}${COLORS.reset}`);
+      console.log(`  ${COLORS.bright}${COLORS.redTeam}${title}${COLORS.reset}`);
       if (subtitle) console.log(`  ${COLORS.dim}${subtitle}${COLORS.reset}`);
-      console.log(`${COLORS.terracotta}${"=".repeat(width)}${COLORS.reset}`);
+      console.log(`${COLORS.redTeam}${"=".repeat(width)}${COLORS.reset}`);
       if (breadcrumb.length > 0) console.log(`  ${COLORS.dim}${breadcrumb.join(" > ")}${COLORS.reset}`);
       console.log();
       if (headerContent) { console.log(headerContent); console.log(); }
@@ -114,7 +116,7 @@ async function selectMenu(title, items, defaultIndex = 0, subtitle = "", headerC
         const isSelected = index === selectedIndex;
         const icon = isSelected ? (isWin ? ">" : "★") : (isWin ? " " : "☆");
         if (isSelected) {
-          console.log(` ${COLORS.reverse}${COLORS.bright}${icon} ${item.label}${COLORS.reset}`);
+          console.log(` ${COLORS.bgRedTeam}${COLORS.white}${COLORS.bright}${icon} ${item.label}${COLORS.reset}`);
         } else {
           console.log(`  ${icon} ${item.label}`);
         }

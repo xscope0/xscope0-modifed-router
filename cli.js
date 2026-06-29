@@ -527,7 +527,7 @@ async function showInterfaceMenu(latestVersion) {
     serverUrl = `http://${displayHost}:${port}`;
   }
 
-  const subtitle = `🚀 Server: \x1b[32m${serverUrl}\x1b[0m`;
+  const subtitle = `🚀 Server: \x1b[38;2;190;80;80m${serverUrl}\x1b[0m`;
 
   const menuItems = [];
 

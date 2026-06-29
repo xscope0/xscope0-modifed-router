@@ -44,6 +44,7 @@ export default function ProviderDetailPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showEditNodeModal, setShowEditNodeModal] = useState(false);
   const [showBulkProxyModal, setShowBulkProxyModal] = useState(false);
+  const [showDeleteMenu, setShowDeleteMenu] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState(null);
   const [modelAliases, setModelAliases] = useState({});
   const [customModels, setCustomModels] = useState([]);
@@ -689,6 +690,7 @@ export default function ProviderDetailPage() {
   const handleBulkDelete = () => {
     const count = selectedConnectionIds.length;
     if (count === 0) return;
+    setShowDeleteMenu(false);
     setConfirmState({
       title: `Delete ${count} Connection${count > 1 ? "s" : ""}`,
       message: `Delete ${count} selected connection${count > 1 ? "s" : ""}? This cannot be undone.`,
@@ -703,6 +705,7 @@ export default function ProviderDetailPage() {
     const idsToDelete = connections.filter(c => c.isActive === false).map(c => c.id);
     const count = idsToDelete.length;
     if (count === 0) return;
+    setShowDeleteMenu(false);
     setConfirmState({
       title: `Delete ${count} Inactive Account${count > 1 ? "s" : ""}`,
       message: `Delete all inactive/deactivated accounts for this provider? This cannot be undone.`,
@@ -1425,26 +1428,16 @@ export default function ProviderDetailPage() {
                 </Button>
               )}
               {connections.length > 1 && (
-                <>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    icon="delete_sweep"
-                    onClick={handleBulkDelete}
-                    disabled={selectedConnectionIds.length === 0}
-                  >
-                    Delete selected{selectedConnectionIds.length > 0 ? ` (${selectedConnectionIds.length})` : ""}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="danger"
-                    icon="delete"
-                    onClick={handleDeleteInactive}
-                    disabled={!connections.some(c => c.isActive === false)}
-                  >
-                    Delete inactive
-                  </Button>
-                </>
+                <Button
+                  size="sm"
+                  variant="danger"
+                  icon="delete"
+                  onClick={() => setShowDeleteMenu(true)}
+                  disabled={selectedConnectionIds.length === 0 && !connections.some(c => c.isActive === false)}
+                  className="w-full sm:w-auto"
+                >
+                  Delete
+                </Button>
               )}
               {connections.length > 0 && (
                 <>
@@ -1454,8 +1447,9 @@ export default function ProviderDetailPage() {
                     icon="sync"
                     onClick={handleRunOneByOneTest}
                     disabled={oneByOneRunning}
+                    className="w-full sm:w-auto whitespace-nowrap"
                   >
-                    {oneByOneRunning ? "Testing Connection One-by-One..." : "Test Connection One-by-One"}
+                    {oneByOneRunning ? "Testing..." : "Test each"}
                   </Button>
                   {oneByOneRunning && (
                     <Button
@@ -1788,6 +1782,32 @@ export default function ProviderDetailPage() {
           onSuccess={fetchConnections}
         />
       )}
+
+      <Modal
+        isOpen={showDeleteMenu}
+        onClose={() => setShowDeleteMenu(false)}
+        title="Delete accounts"
+        size="sm"
+      >
+        <div className="flex flex-col gap-2">
+          <button
+            onClick={handleBulkDelete}
+            disabled={selectedConnectionIds.length === 0}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px] text-danger">delete_sweep</span>
+            <span className="text-sm text-text-main">Selected ({selectedConnectionIds.length})</span>
+          </button>
+          <button
+            onClick={handleDeleteInactive}
+            disabled={!connections.some(c => c.isActive === false)}
+            className="flex items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-black/[0.04] dark:hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px] text-danger">delete</span>
+            <span className="text-sm text-text-main">Inactive ({connections.filter(c => c.isActive === false).length})</span>
+          </button>
+        </div>
+      </Modal>
 
       {/* AG Risk Confirmation Modal */}
       <ConfirmModal
