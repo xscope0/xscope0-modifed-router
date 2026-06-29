@@ -46,14 +46,82 @@ const pkg = require("./package.json");
 const { ensureSqliteRuntime, buildEnvWithRuntime } = require("./hooks/sqliteRuntime");
 const { ensureTrayRuntime } = require("./hooks/trayRuntime");
 const args = process.argv.slice(2);
+const APP_PID_FILE = path.join(os.homedir(), ".9router", "router.pid");
+
+function killPid(pid) {
+  if (!pid || pid === process.pid.toString()) return;
+  try {
+    if (process.platform === "win32") {
+      execSync(`taskkill /F /T /PID ${pid} 2>nul`, { stdio: "ignore", shell: true, windowsHide: true, timeout: 3000 });
+    } else {
+      execSync(`kill -9 ${pid} 2>/dev/null`, { stdio: "ignore", timeout: 3000 });
+    }
+  } catch { }
+}
+
+function killRuntimeBuildProcesses() {
+  if (process.platform === "win32") return;
+  try {
+    const output = execSync("ps -eo pid,command 2>/dev/null", { encoding: "utf8", timeout: 5000 });
+    output.split("\n").forEach(line => {
+      if (!line.includes(".9router/runtime/node_modules/better-sqlite3/build")) return;
+      const pid = line.trim().split(/\s+/)[0];
+      killPid(pid);
+    });
+  } catch { }
+}
+
+function killAppPidFile() {
+  try {
+    if (!fs.existsSync(APP_PID_FILE)) return;
+    const pid = fs.readFileSync(APP_PID_FILE, "utf8").trim();
+    killPid(pid);
+    killRuntimeBuildProcesses();
+    try { fs.unlinkSync(APP_PID_FILE); } catch { }
+  } catch { }
+}
+
+function killPeerAppProcesses() {
+  if (process.platform === "win32") return;
+  try {
+    const output = execSync("ps -eo pid,command 2>/dev/null", { encoding: "utf8", timeout: 5000 });
+    output.split("\n").forEach(line => {
+      const cmd = line.toLowerCase();
+      const isPeer = cmd.includes("node") && (
+        cmd.includes("/opt/homebrew/bin/9router") ||
+        cmd.includes("/opt/homebrew/bin/xscope0-router") ||
+        cmd.includes("/9router/cli.js")
+      );
+      if (!isPeer) return;
+      const pid = line.trim().split(/\s+/)[0];
+      killPid(pid);
+    });
+  } catch { }
+}
+
+function writeAppPidFile() {
+  try {
+    fs.mkdirSync(path.dirname(APP_PID_FILE), { recursive: true });
+    fs.writeFileSync(APP_PID_FILE, process.pid.toString());
+  } catch { }
+}
+
+const isInfoOnly = args.includes("--help") || args.includes("-h") || args.includes("--version") || args.includes("-v");
+
+if (!isInfoOnly) {
+  // Claim singleton before runtime self-heal can compile native modules.
+  killAppPidFile();
+  killPeerAppProcesses();
+  writeAppPidFile();
+}
 
 // Self-heal SQLite runtime deps (sql.js + better-sqlite3) into ~/.9router/runtime
 // so the server can resolve them via NODE_PATH. Best-effort — sql.js is required,
 // better-sqlite3 is optional. Logs to stderr only on failure.
-try { ensureSqliteRuntime({ silent: true }); } catch {}
+if (!isInfoOnly) try { ensureSqliteRuntime({ silent: true }); } catch {}
 
 // Self-heal tray runtime (systray for macOS/Linux only). Windows skipped.
-try { ensureTrayRuntime({ silent: true }); } catch {}
+if (!isInfoOnly) try { ensureTrayRuntime({ silent: true }); } catch {}
 
 // Configuration constants
 const APP_NAME = pkg.name; // Use from package.json
@@ -212,6 +280,9 @@ function killCloudflaredByAppPort(appPort) {
 function killAllAppProcesses(appPort) {
   return new Promise((resolve) => {
     try {
+      // Kill current/previous app first via PID lock, then child processes.
+      killAppPidFile();
+      killRuntimeBuildProcesses();
       // Kill MIT first (privileged process, needs special handling)
       killProxyByPidFile();
       // Kill cloudflared/tailscale by PID file (precise, only this app's tunnel)
@@ -238,7 +309,7 @@ function killAllAppProcesses(appPort) {
             // Avoids killing editors/grep/strace/cursor that just have "9router" in cmdline.
             const cmd = line.toLowerCase();
             const isAppProcess =
-              (cmd.includes("node") && cmd.includes("9router") && (cmd.includes("cli.js") || cmd.includes("\\9router") || cmd.includes("/9router")))
+              (cmd.includes("node") && (cmd.includes("9router") || cmd.includes("xscope0-router")) && (cmd.includes("cli.js") || cmd.includes("\\9router") || cmd.includes("/9router") || cmd.includes("xscope0-router")))
               || cmd.includes("next-server");
             if (isAppProcess) {
               const match = line.match(/^"(\d+)"/);
@@ -264,7 +335,7 @@ function killAllAppProcesses(appPort) {
             // Avoids killing grep/strace/editors/cursor that incidentally match "9router".
             const cmd = line.toLowerCase();
             const isAppProcess =
-              (cmd.includes("node") && cmd.includes("9router") && (cmd.includes("cli.js") || cmd.includes("/9router")))
+              (cmd.includes("node") && (cmd.includes("9router") || cmd.includes("xscope0-router")) && (cmd.includes("cli.js") || cmd.includes("/9router") || cmd.includes("xscope0-router")))
               || cmd.includes("next-server");
             if (isAppProcess) {
               const parts = line.trim().split(/\s+/);
@@ -284,9 +355,9 @@ function killAllAppProcesses(appPort) {
         pids.forEach(pid => {
           try {
             if (platform === "win32") {
-              execSync(`taskkill /F /PID ${pid} 2>nul`, { stdio: 'ignore', shell: true, windowsHide: true, timeout: 3000 });
+              killPid(pid);
             } else {
-              execSync(`kill -9 ${pid} 2>/dev/null`, { stdio: 'ignore', timeout: 3000 });
+              killPid(pid);
             }
           } catch (err) {
             // Process already dead or can't kill - continue
@@ -603,6 +674,7 @@ function startServer(latestVersion) {
     if (isCleaningUp) return;
     isCleaningUp = true;
     try {
+      try { if (fs.existsSync(APP_PID_FILE) && fs.readFileSync(APP_PID_FILE, "utf8").trim() === process.pid.toString()) fs.unlinkSync(APP_PID_FILE); } catch { }
       // Kill tray if running
       try {
         const { killTray } = require("./src/cli/tray/tray");

@@ -123,17 +123,9 @@ function ensureSqliteRuntime({ silent = false } = {}) {
     if (sqlJsOk) sqlJsOk = isSqlJsWasmValid();
   }
 
-  const needBetterSqlite = !hasModule("better-sqlite3") || !isBetterSqliteBinaryValid();
-  if (!needBetterSqlite) {
-    if (!silent) console.log("✅ SQLite engine ready");
-    return { betterSqlite: true, sqlJs: sqlJsOk };
-  }
-
-  const ok = npmInstall([`better-sqlite3@${BETTER_SQLITE3_VERSION}`], { optional: true, silent });
-  return {
-    betterSqlite: ok && hasModule("better-sqlite3") && isBetterSqliteBinaryValid(),
-    sqlJs: sqlJsOk,
-  };
+  const betterSqliteOk = hasModule("better-sqlite3") && isBetterSqliteBinaryValid();
+  if (!silent) console.log("✅ SQLite engine ready");
+  return { betterSqlite: betterSqliteOk, sqlJs: sqlJsOk };
 }
 
 // Inject runtime + bundled node_modules into NODE_PATH so child Node processes
