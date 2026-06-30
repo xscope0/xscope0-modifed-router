@@ -12,7 +12,7 @@
 
   <br><br>
 
-  <a href="#">🇮🇩 Bahasa Indonesia</a> · <a href="#">🇻🇳 Tiếng Việt</a> · <a href="#">🇨🇳 中文</a> · <a href="#">🇯🇵 日本語</a> · <a href="#">🇷🇺 Русский</a>
+  <a href="docs/id.md">🇮🇩 Bahasa Indonesia</a> · <a href="docs/vi.md">🇻🇳 Tiếng Việt</a> · <a href="docs/zh.md">🇨🇳 中文</a> · <a href="docs/ja.md">🇯🇵 日本語</a> · <a href="docs/ru.md">🇷🇺 Русский</a>
 </div>
 
 ---
