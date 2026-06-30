@@ -19,7 +19,7 @@
 <div align="center">
   <img src="../assets/preview/preview-2.png" alt="ダッシュボード" width="32%">
   <img src="../assets/preview/preview-3.png" alt="プロバイダー" width="32%">
-  <img src="../assets/preview/preview-4.png" alt="設定" width="32%">
+  <img src="../assets/preview/preview-settings.png" alt="設定" width="32%">
 </div>
 
 ---

@@ -19,7 +19,7 @@
 <div align="center">
   <img src="../assets/preview/preview-2.png" alt="仪表板" width="32%">
   <img src="../assets/preview/preview-3.png" alt="提供商" width="32%">
-  <img src="../assets/preview/preview-4.png" alt="设置" width="32%">
+  <img src="../assets/preview/preview-settings.png" alt="设置" width="32%">
 </div>
 
 ---

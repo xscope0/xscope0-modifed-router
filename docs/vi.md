@@ -19,7 +19,7 @@
 <div align="center">
   <img src="../assets/preview/preview-2.png" alt="Dashboard" width="32%">
   <img src="../assets/preview/preview-3.png" alt="Nhà cung cấp" width="32%">
-  <img src="../assets/preview/preview-4.png" alt="Cài đặt" width="32%">
+  <img src="../assets/preview/preview-settings.png" alt="Cài đặt" width="32%">
 </div>
 
 ---

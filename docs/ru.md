@@ -19,7 +19,7 @@
 <div align="center">
   <img src="../assets/preview/preview-2.png" alt="Панель управления" width="32%">
   <img src="../assets/preview/preview-3.png" alt="Провайдеры" width="32%">
-  <img src="../assets/preview/preview-4.png" alt="Настройки" width="32%">
+  <img src="../assets/preview/preview-settings.png" alt="Настройки" width="32%">
 </div>
 
 ---
