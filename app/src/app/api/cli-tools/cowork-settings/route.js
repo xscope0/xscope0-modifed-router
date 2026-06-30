@@ -263,7 +263,7 @@ export async function GET() {
       ? config.inferenceModels.flatMap((m) => { const n = typeof m === "string" ? m : m?.name; return n ? [n] : []; })
       : [];
     const managedMcp = Array.isArray(config?.managedMcpServers) ? config.managedMcpServers : [];
-    const hasVansRoute = !!(config?.inferenceProvider === PROVIDER && baseUrl);
+    const hasRouterConfig = !!(config?.inferenceProvider === PROVIDER && baseUrl);
 
     // Active local plugins = managedMcp entries whose URL points at our inline bridge.
     const stdioNames = new Set(LOCAL_STDIO_PLUGINS.map((p) => p.name));
@@ -283,7 +283,7 @@ export async function GET() {
     return NextResponse.json({
       installed: true,
       config,
-      hasVansRoute,
+      hasRouterConfig,
       configPath,
       cowork: {
         appliedId,

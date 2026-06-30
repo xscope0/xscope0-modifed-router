@@ -42,7 +42,7 @@ export async function GET() {
   const provider = modelsJson.providers?.[PROVIDER_ID] || null;
   return NextResponse.json({
     installed,
-    hasVansRoute: installed && !!provider,
+    hasRouterConfig: installed && !!provider,
     providerId: PROVIDER_ID,
     modelsPath,
     settingsPath,

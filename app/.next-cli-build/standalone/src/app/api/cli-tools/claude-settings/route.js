@@ -64,12 +64,12 @@ export async function GET() {
     }
 
     const settings = await readSettings();
-    const hasVansRoute = !!(settings?.env?.ANTHROPIC_BASE_URL);
+    const hasRouterConfig = !!(settings?.env?.ANTHROPIC_BASE_URL);
 
     return NextResponse.json({
       installed: true,
       settings: settings,
-      hasVansRoute: hasVansRoute,
+      hasRouterConfig: hasRouterConfig,
       settingsPath: getClaudeSettingsPath(),
     });
   } catch (error) {

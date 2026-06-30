@@ -48,7 +48,7 @@ const readConfig = async () => {
   }
 };
 
-const hasVansRouteConfig = (config) => {
+const hasRouterConfig = (config) => {
   if (!config?.provider) return false;
   return !!config.provider["9router"];
 };
@@ -73,7 +73,7 @@ export async function GET() {
     return NextResponse.json({
       installed: true,
       config,
-      hasVansRoute: hasVansRouteConfig(config),
+      hasRouterConfig: hasRouterConfig(config),
       configPath: getConfigPath(),
         opencode: {
           models: Object.keys(modelMap),

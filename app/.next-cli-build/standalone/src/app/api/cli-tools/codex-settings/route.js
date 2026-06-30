@@ -92,7 +92,7 @@ const readConfigParsed = async () => {
 };
 
 // Check if config has 9Router settings
-const hasVansRouteConfig = (config) => {
+const hasRouterConfig = (config) => {
   if (!config) return false;
   return config.includes("model_provider = \"9router\"") || config.includes("[model_providers.9router]");
 };
@@ -115,7 +115,7 @@ export async function GET() {
     return NextResponse.json({
       installed: true,
       config,
-      hasVansRoute: hasVansRouteConfig(config),
+      hasRouterConfig: hasRouterConfig(config),
       configPath: getCodexConfigPath(),
     });
   } catch (error) {

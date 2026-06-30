@@ -26,7 +26,7 @@ function DroidExpandedSection({ addModel, applying, checkingDroid, customBaseUrl
                   <span className="material-symbols-outlined text-yellow-500">warning</span>
                   <div className="flex-1">
                     <p className="font-medium text-yellow-600 dark:text-yellow-400">Factory Droid CLI not detected locally</p>
-                    <p className="text-sm text-text-muted">Manual configuration is still available if VansAI is deployed on a remote server.</p>
+                    <p className="text-sm text-text-muted">Manual configuration is still available if xscope0 Modifed is deployed on a remote server.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 pl-9">
@@ -74,12 +74,12 @@ function DroidExpandedSection({ addModel, applying, checkingDroid, customBaseUrl
                 </div>
 
                 {/* Current configured */}
-                {droidStatus?.settings?.customModels?.find(m => m.id?.startsWith("custom:VansRoute"))?.baseUrl && (
+                {droidStatus?.settings?.customModels?.find(m => m.id?.startsWith("custom:xscope0"))?.baseUrl && (
                   <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-[8rem_auto_1fr_auto] sm:items-center sm:gap-2">
                     <span className="text-xs font-semibold text-text-main sm:text-right sm:text-sm">Current</span>
                     <span className="material-symbols-outlined hidden text-text-muted text-[14px] sm:inline">arrow_forward</span>
                     <span className="min-w-0 truncate rounded bg-surface/40 px-2 py-2 text-xs text-text-muted sm:py-1.5">
-                      {droidStatus.settings.customModels.find(m => m.id?.startsWith("custom:VansRoute")).baseUrl}
+                      {droidStatus.settings.customModels.find(m => m.id?.startsWith("custom:xscope0")).baseUrl}
                     </span>
                   </div>
                 )}
@@ -147,7 +147,7 @@ function DroidExpandedSection({ addModel, applying, checkingDroid, customBaseUrl
                 <Button variant="primary" size="sm" onClick={handleApplySettings} disabled={modelList.length === 0} loading={applying}>
                   <span className="material-symbols-outlined text-[14px] mr-1">save</span>Apply
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleResetSettings} disabled={!droidStatus?.hasVansRoute} loading={restoring}>
+                <Button variant="outline" size="sm" onClick={handleResetSettings} disabled={!droidStatus?.hasRouterConfig} loading={restoring}>
                   <span className="material-symbols-outlined text-[14px] mr-1">restore</span>Reset
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => setShowManualConfigModal(true)}>
@@ -196,11 +196,11 @@ export default function DroidToolCard({
   const modelList = modelListOverride ?? (() => {
     if (!droidStatus?.installed) return [];
     const existingModels = (droidStatus.settings?.customModels || [])
-      .filter(m => m.id?.startsWith("custom:VansRoute"))
+      .filter(m => m.id?.startsWith("custom:xscope0"))
       .sort((a, b) => (a.index || 0) - (b.index || 0))
       .map(m => m.model);
     if (existingModels.length > 0) return existingModels;
-    const legacy = droidStatus.settings?.customModels?.find(m => m.id === "custom:VansRoute-0");
+    const legacy = droidStatus.settings?.customModels?.find(m => m.id === "custom:xscope0-0");
     return legacy?.model ? [legacy.model] : [];
   })();
   const [modelInput, setModelInput] = useState("");
@@ -212,8 +212,8 @@ export default function DroidToolCard({
 
   const getConfigStatus = () => {
     if (!droidStatus?.installed) return null;
-    // Check for any VansRoute model entry (support multi-model: custom:VansRoute-0, custom:VansRoute-1, ...)
-    const currentConfig = droidStatus.settings?.customModels?.find(m => m.id?.startsWith("custom:VansRoute"));
+    // Check for any xscope0 model entry (support multi-model: custom:xscope0-0, custom:xscope0-1, ...)
+    const currentConfig = droidStatus.settings?.customModels?.find(m => m.id?.startsWith("custom:xscope0"));
     if (!currentConfig) return "not_configured";
     return matchKnownEndpoint(currentConfig.baseUrl, { tunnelPublicUrl, tailscaleUrl, cloudUrl: cloudEnabled ? CLOUD_URL : null }) ? "configured" : "other";
   };
@@ -295,7 +295,7 @@ export default function DroidToolCard({
     try {
       const keyToUse = selectedApiKey?.trim()
         || (apiKeys?.length > 0 ? apiKeys[0].key : null)
-        || (!cloudEnabled ? "sk_VansRoute" : null);
+        || (!cloudEnabled ? "sk_xscope0" : null);
 
       const res = await fetch("/api/cli-tools/droid-settings", {
         method: "POST",
@@ -339,12 +339,12 @@ export default function DroidToolCard({
   const getManualConfigs = () => {
     const keyToUse = (selectedApiKey && selectedApiKey.trim())
       ? selectedApiKey
-      : (!cloudEnabled ? "sk_VansRoute" : "<API_KEY_FROM_DASHBOARD>");
+      : (!cloudEnabled ? "sk_xscope0" : "<API_KEY_FROM_DASHBOARD>");
 
     const settingsContent = {
       customModels: modelList.map((m, i) => ({
         model: m,
-        id: `custom:VansRoute-${i}`,
+        id: `custom:xscope0-${i}`,
         index: i,
         baseUrl: getEffectiveBaseUrl(),
         apiKey: keyToUse,

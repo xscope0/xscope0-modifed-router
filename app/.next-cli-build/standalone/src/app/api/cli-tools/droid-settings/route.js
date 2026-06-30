@@ -47,7 +47,7 @@ const readSettings = async () => {
 };
 
 // Check if settings has 9Router customModels
-const hasVansRouteConfig = (settings) => {
+const hasRouterConfig = (settings) => {
   if (!settings || !settings.customModels) return false;
   return settings.customModels.some(m => m.id?.startsWith("custom:9Router"));
 };
@@ -70,7 +70,7 @@ export async function GET() {
     return NextResponse.json({
       installed: true,
       settings,
-      hasVansRoute: hasVansRouteConfig(settings),
+      hasRouterConfig: hasRouterConfig(settings),
       settingsPath: getDroidSettingsPath(),
     });
   } catch (error) {

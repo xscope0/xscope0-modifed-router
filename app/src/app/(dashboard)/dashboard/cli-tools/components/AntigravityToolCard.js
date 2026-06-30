@@ -81,7 +81,7 @@ function AntigravityExpandedSection({ handleModelMappingChange, handleSaveMappin
                   </select>
                 ) : (
                   <span className="min-w-0 rounded bg-surface/40 px-2 py-2 text-xs text-text-muted sm:py-1.5">
-                    {cloudEnabled ? "No API keys - Create one in Keys page" : "sk_VansRoute (default)"}
+                    {cloudEnabled ? "No API keys - Create one in Keys page" : "sk_xscope0 (default)"}
                   </span>
                 )}
               </div>
@@ -136,7 +136,7 @@ function AntigravityExpandedSection({ handleModelMappingChange, handleSaveMappin
           {!isRunning && serverIsWindows && (
             <div className="flex items-center gap-2 px-2 py-1.5 rounded text-xs bg-yellow-500/10 text-yellow-600 border border-yellow-500/20">
               <span className="material-symbols-outlined text-[14px]">warning</span>
-              <span>Windows: Run terminal (VansAI) as Administrator to enable MITM</span>
+              <span>Windows: Run terminal (xscope0 Modifed) as Administrator to enable MITM</span>
             </div>
           )}
 
@@ -144,12 +144,12 @@ function AntigravityExpandedSection({ handleModelMappingChange, handleSaveMappin
           {!isRunning && (
             <div className="flex flex-col gap-1.5 px-1">
               <p className="text-xs text-text-muted">
-                <span className="font-medium text-text-main">How it works:</span> Intercepts Antigravity traffic via DNS redirect, letting you reroute models through VansAI.
+                <span className="font-medium text-text-main">How it works:</span> Intercepts Antigravity traffic via DNS redirect, letting you reroute models through xscope0 Modifed.
               </p>
               <div className="flex flex-col gap-0.5 text-[11px] text-text-muted">
                 <span>1. Generates SSL cert & adds to system keychain</span>
                 <span>2. Redirects <code className="text-[10px] bg-surface px-1 rounded">daily-cloudcode-pa.googleapis.com</code> → localhost</span>
-                <span>3. Maps Antigravity models to any provider via VansAI</span>
+                <span>3. Maps Antigravity models to any provider via xscope0 Modifed</span>
               </div>
             </div>
           )}
@@ -320,7 +320,7 @@ export default function AntigravityToolCard({
     try {
       const keyToUse = selectedApiKey?.trim()
         || (apiKeys?.length > 0 ? apiKeys[0].key : null)
-        || (!cloudEnabled ? "sk_VansRoute" : null);
+        || (!cloudEnabled ? "sk_xscope0" : null);
 
       const res = await fetch("/api/cli-tools/antigravity-mitm", {
         method: "POST",

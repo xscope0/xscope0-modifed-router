@@ -137,8 +137,8 @@ export default function Sidebar({ onClose }) {
               </span>
               {updateInfo.githubStatus && (
                 <span className="text-[10px] text-text-muted">
-                  {updateInfo.githubStatus === "github_ahead" && "vansrouter already has this version — pull to update"}
-                  {updateInfo.githubStatus === "github_behind_npm" && "vansrouter repo hasn't been updated to this version yet"}
+                  {updateInfo.githubStatus === "github_ahead" && "xscope0-router already has this version — pull to update"}
+                  {updateInfo.githubStatus === "github_behind_npm" && "xscope0-router repo hasn't been updated to this version yet"}
                 </span>
               )}
               <div className="flex items-center gap-2">

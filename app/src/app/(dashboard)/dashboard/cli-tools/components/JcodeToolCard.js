@@ -36,7 +36,7 @@ function JcodeExpandedSection({ apiKeys, applying, checkingJcode, cloudEnabled, 
                     <code className="block mt-2 p-2 bg-black/20 rounded text-xs font-mono">
                       curl -fsSL https://raw.githubusercontent.com/1jehuang/jcode/master/scripts/install.sh | bash
                     </code>
-                    <p className="text-sm text-text-muted mt-2">Manual configuration is still available if VansRoute is deployed on a remote server.</p>
+                    <p className="text-sm text-text-muted mt-2">Manual configuration is still available if xscope0 Modifed is deployed on a remote server.</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 pl-9">
@@ -86,12 +86,12 @@ function JcodeExpandedSection({ apiKeys, applying, checkingJcode, cloudEnabled, 
                 </div>
 
                 {/* Current configured */}
-                {jcodeStatus?.config?.providers?.["VansRoute"]?.base_url && (
+                {jcodeStatus?.config?.providers?.["xscope0"]?.base_url && (
                   <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-[8rem_auto_1fr_auto] sm:items-center sm:gap-2">
                     <span className="text-xs font-semibold text-text-main sm:text-right sm:text-sm">Current</span>
                     <span className="material-symbols-outlined hidden text-text-muted text-[14px] sm:inline">arrow_forward</span>
                     <span className="min-w-0 truncate rounded bg-surface/40 px-2 py-2 text-xs text-text-muted sm:py-1.5">
-                      {jcodeStatus.config.providers["VansRoute"].base_url}
+                      {jcodeStatus.config.providers["xscope0"].base_url}
                     </span>
                   </div>
                 )}
@@ -133,7 +133,7 @@ function JcodeExpandedSection({ apiKeys, applying, checkingJcode, cloudEnabled, 
                 <Button variant="primary" size="sm" onClick={handleApplySettings} disabled={!selectedModel} loading={applying}>
                   <span className="material-symbols-outlined text-[14px] mr-1">save</span>Apply
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleResetSettings} disabled={!jcodeStatus?.hasVansRoute} loading={restoring}>
+                <Button variant="outline" size="sm" onClick={handleResetSettings} disabled={!jcodeStatus?.hasRouterConfig} loading={restoring}>
                   <span className="material-symbols-outlined text-[14px] mr-1">restore</span>Reset
                 </Button>
                 <Button variant="ghost" size="sm" onClick={() => setShowManualConfigModal(true)}>
@@ -181,7 +181,7 @@ export default function JcodeToolCard({
   const derivedApiKey = envApiKey && apiKeys?.some(k => k.key === envApiKey) ? envApiKey : null;
   const selectedApiKey = selectedApiKeyOverride ?? derivedApiKey ?? (apiKeys?.length > 0 ? apiKeys[0].key : "");
   const [selectedModelOverride, setSelectedModel] = useState(null);
-  const selectedModel = selectedModelOverride ?? jcodeStatus?.config?.providers?.["VansRoute"]?.default_model ?? "";
+  const selectedModel = selectedModelOverride ?? jcodeStatus?.config?.providers?.["xscope0"]?.default_model ?? "";
   const [modalOpen, setModalOpen] = useState(false);
   const [modelAliases, setModelAliases] = useState({});
   const [showManualConfigModal, setShowManualConfigModal] = useState(false);
@@ -189,8 +189,8 @@ export default function JcodeToolCard({
 
   const getConfigStatus = () => {
     if (!jcodeStatus?.installed) return null;
-    if (!jcodeStatus?.hasVansRoute) return "not_configured";
-    const currentProvider = jcodeStatus.config?.providers?.["VansRoute"];
+    if (!jcodeStatus?.hasRouterConfig) return "not_configured";
+    const currentProvider = jcodeStatus.config?.providers?.["xscope0"];
     if (!currentProvider) return "not_configured";
     return matchKnownEndpoint(currentProvider.base_url, { tunnelPublicUrl, tailscaleUrl }) ? "configured" : "other";
   };
@@ -257,7 +257,7 @@ export default function JcodeToolCard({
     try {
       const keyToUse = selectedApiKey?.trim()
         || (apiKeys?.length > 0 ? apiKeys[0].key : null)
-        || (!cloudEnabled ? "sk_VansRoute" : null);
+        || (!cloudEnabled ? "sk_xscope0" : null);
 
       const res = await fetch("/api/cli-tools/jcode-settings", {
         method: "POST",
@@ -306,21 +306,21 @@ export default function JcodeToolCard({
   const getManualConfigs = () => {
     const keyToUse = (selectedApiKey && selectedApiKey.trim())
       ? selectedApiKey
-      : (!cloudEnabled ? "sk_VansRoute" : "<API_KEY_FROM_DASHBOARD>");
+      : (!cloudEnabled ? "sk_xscope0" : "<API_KEY_FROM_DASHBOARD>");
 
-    const configToml = `[providers.VansRoute]
+    const configToml = `[providers.xscope0]
 type = "openai-compatible"
 base_url = "${getEffectiveBaseUrl()}"
 auth = "bearer"
-api_key_env = "JCODE_VansRoute_API_KEY"
-env_file = "provider-VansRoute.env"
+api_key_env = "JCODE_xscope0_API_KEY"
+env_file = "provider-xscope0.env"
 default_model = "${selectedModel || "cc/claude-opus-4-7"}"
 requires_api_key = true
 
-[[providers.VansRoute.models]]
+[[providers.xscope0.models]]
 id = "${selectedModel || "cc/claude-opus-4-7"}"`;
 
-    const envContent = `JCODE_VansRoute_API_KEY="${keyToUse}"`;
+    const envContent = `JCODE_xscope0_API_KEY="${keyToUse}"`;
 
     return [
       {
@@ -328,7 +328,7 @@ id = "${selectedModel || "cc/claude-opus-4-7"}"`;
         content: configToml,
       },
       {
-        filename: "~/.config/jcode/provider-VansRoute.env",
+        filename: "~/.config/jcode/provider-xscope0.env",
         content: envContent,
       },
     ];

@@ -130,7 +130,7 @@ export function unavailableResponse(statusCode, message, retryAfter, retryAfterH
 }
 
 /**
- * Attach the X-VansRoute-Selected-Connection-Id header to a response so
+ * Attach the X-xscope0-Selected-Connection-Id header to a response so
  * clients can see which upstream account handled their request.
  *
  * Works for both streaming and non-streaming responses: `response.body`
@@ -146,7 +146,7 @@ export function unavailableResponse(statusCode, message, retryAfter, retryAfterH
 export function withSelectedConnectionHeader(response, connectionId) {
   if (!response || !connectionId) return response;
   const headers = new Headers(response.headers);
-  headers.set("X-VansRoute-Selected-Connection-Id", connectionId);
+  headers.set("X-xscope0-Selected-Connection-Id", connectionId);
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

@@ -44,7 +44,7 @@ const readJson = async (filePath) => {
   }
 };
 
-const hasVansRouteConfig = (auth) => {
+const hasRouterConfig = (auth) => {
   if (!auth) return false;
   const entry = auth["openai-compatible"] || auth["9router"];
   if (!entry) return false;
@@ -62,7 +62,7 @@ export async function GET() {
     return NextResponse.json({
       installed: true,
       settings: { auth: auth ? Object.keys(auth) : [] },
-      hasVansRoute: hasVansRouteConfig(auth),
+      hasRouterConfig: hasRouterConfig(auth),
       authPath: getAuthPath(),
     });
   } catch (error) {

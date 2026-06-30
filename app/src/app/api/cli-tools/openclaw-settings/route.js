@@ -57,7 +57,7 @@ const readSettings = async () => {
 };
 
 // Check if settings has 9Router config
-const hasVansRouteConfig = (settings) => {
+const hasRouterConfig = (settings) => {
   if (!settings || !settings.models || !settings.models.providers) return false;
   return !!settings.models.providers["9router"];
 };
@@ -105,7 +105,7 @@ export async function GET() {
       installed: true,
       settings,
       agents: enrichedAgents,
-      hasVansRoute: hasVansRouteConfig(settings),
+      hasRouterConfig: hasRouterConfig(settings),
       settingsPath: getOpenClawSettingsPath(),
     });
   } catch (error) {

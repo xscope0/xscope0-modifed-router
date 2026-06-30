@@ -93,7 +93,7 @@ const readConfigToml = async () => {
 };
 
 // Detect 9Router by checking if provider is "openai" and base_url points to localhost/127.0.0.1
-const hasVansRouteConfig = (config) => {
+const hasRouterConfig = (config) => {
     if (!config) return false;
     const provider = config.provider;
     if (provider !== "openai") return false;
@@ -113,7 +113,7 @@ export async function GET() {
         return NextResponse.json({
             installed: true,
             settings: config,
-            hasVansRoute: hasVansRouteConfig(config),
+            hasRouterConfig: hasRouterConfig(config),
             configPath: getDeepSeekConfigPath(),
         });
     } catch (error) {

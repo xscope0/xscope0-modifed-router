@@ -1,8 +1,7 @@
 import https from "https";
 import pkg from "../../../../package.json" with { type: "json" };
 
-const NPM_PACKAGE_NAME = "vansrouter";
-const GITHUB_RAW_PKG = "https://raw.githubusercontent.com/Vanszs/VansRouter/main/package.json";
+const GITHUB_RAW_PKG = "https://raw.githubusercontent.com/xscope0/xScope0-Router/main/package.json";
 
 function fetchJson(url) {
   return new Promise((resolve) => {
@@ -19,14 +18,6 @@ function fetchJson(url) {
     });
     req.on("error", () => resolve(null));
     req.on("timeout", () => { req.destroy(); resolve(null); });
-  });
-}
-
-// Fetch latest version from npm registry
-function fetchLatestVersion() {
-  return new Promise(async (resolve) => {
-    const data = await fetchJson(`https://registry.npmjs.org/${NPM_PACKAGE_NAME}/latest`);
-    resolve(data?.version || null);
   });
 }
 
@@ -49,29 +40,17 @@ function compareVersions(a, b) {
 }
 
 export async function GET() {
-  const [latestVersion, githubVersion] = await Promise.all([
-    fetchLatestVersion(),
-    fetchGitHubVersion(),
-  ]);
+  const githubVersion = await fetchGitHubVersion();
   const currentVersion = pkg.version;
-  const hasUpdate = latestVersion ? compareVersions(latestVersion, currentVersion) > 0 : false;
-
-  // githubStatus tells the user whether the GitHub repo already contains the
-  // newer npm version or is still behind it.
-  let githubStatus = null;
-  if (latestVersion && githubVersion) {
-    const ghVsNpm = compareVersions(githubVersion, latestVersion);
-    const localVsGh = compareVersions(currentVersion, githubVersion);
-    if (ghVsNpm >= 0 && localVsGh < 0) {
-      githubStatus = "github_ahead"; // GitHub already has the new version
-    } else if (ghVsNpm < 0) {
-      githubStatus = "github_behind_npm"; // GitHub repo hasn't received the new npm version yet
-    } else if (localVsGh > 0) {
-      githubStatus = "local_ahead"; // local is ahead of GitHub (unpushed changes)
-    } else {
-      githubStatus = "current";
-    }
-  }
+  const latestVersion = githubVersion;
+  const hasUpdate = githubVersion ? compareVersions(githubVersion, currentVersion) > 0 : false;
+  const githubStatus = githubVersion
+    ? compareVersions(currentVersion, githubVersion) === 0
+      ? "current"
+      : compareVersions(currentVersion, githubVersion) > 0
+        ? "local_ahead"
+        : "github_ahead"
+    : null;
 
   return Response.json({ currentVersion, latestVersion, githubVersion, hasUpdate, githubStatus });
 }

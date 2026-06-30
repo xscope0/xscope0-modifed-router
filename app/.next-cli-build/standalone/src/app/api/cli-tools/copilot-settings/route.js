@@ -30,7 +30,7 @@ const readConfig = async () => {
   }
 };
 
-const hasVansRouteConfig = (config) => {
+const hasRouterConfig = (config) => {
   if (!Array.isArray(config)) return false;
   return config.some((entry) => entry.name === "9Router");
 };
@@ -49,7 +49,7 @@ export async function GET() {
     return NextResponse.json({
       installed: true,
       config,
-      hasVansRoute: hasVansRouteConfig(config),
+      hasRouterConfig: hasRouterConfig(config),
       configPath: getConfigPath(),
       currentModel: entry?.models?.[0]?.id || null,
       currentUrl: entry?.models?.[0]?.url || null,

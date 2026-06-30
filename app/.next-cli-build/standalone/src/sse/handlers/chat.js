@@ -452,7 +452,7 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
       semaphoreRelease();
     }
 
-    if (result.success) return withSelectedConnectionHeader(result.response, credentials.connectionId); // sets X-VansRoute-Selected-Connection-Id
+    if (result.success) return withSelectedConnectionHeader(result.response, credentials.connectionId); // sets selected connection header
 
     // STREAM_EARLY_EOF: flaky upstream sent HTTP 200 then closed the SSE before
     // any useful content frame. Transient upstream glitch — retry once on the
@@ -522,6 +522,6 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
       continue;
     }
 
-    return withSelectedConnectionHeader(result.response, credentials.connectionId); // sets X-VansRoute-Selected-Connection-Id
+    return withSelectedConnectionHeader(result.response, credentials.connectionId); // sets selected connection header
   }
 }

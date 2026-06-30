@@ -44,7 +44,7 @@ const readJson = async (filePath) => {
   }
 };
 
-const hasVansRouteConfig = (globalState) => {
+const hasRouterConfig = (globalState) => {
   if (!globalState) return false;
   const isOpenAi =
     globalState.actModeApiProvider === "openai" || globalState.planModeApiProvider === "openai";
@@ -67,7 +67,7 @@ export async function GET() {
         openAiBaseUrl: globalState?.openAiBaseUrl,
         openAiModelId: globalState?.openAiModelId,
       },
-      hasVansRoute: hasVansRouteConfig(globalState),
+      hasRouterConfig: hasRouterConfig(globalState),
       globalStatePath: getGlobalStatePath(),
     });
   } catch (error) {

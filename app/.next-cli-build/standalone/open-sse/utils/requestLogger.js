@@ -70,7 +70,7 @@ function writeJsonFile(sessionPath, filename, data) {
   }
 }
 
-// Mask sensitive data in headers (OrcaFlow hardening)
+// Mask sensitive data in headers (request hardening)
 function maskSensitiveHeaders(headers) {
   if (!headers) return {};
   const masked = { ...headers };

@@ -4,9 +4,9 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   return NextResponse.json({
-    title: "Support n9Router",
+    title: "Support xscope0 Modifed",
     message:
-      "If n9Router helps your work, consider supporting development. Every contribution keeps the project alive and growing. Thank you! ❤️",
+      "If xscope0 Modifed helps your work, consider supporting development. Every contribution keeps the project alive and growing. Thank you! ❤️",
     channels: [
       {
         id: "kofi",

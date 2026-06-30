@@ -15,9 +15,9 @@ export const GITHUB_CONFIG = {
 
 // Updater configuration
 export const UPDATER_CONFIG = {
-  npmPackageName: "vansrouter",
-  installCmd: "npm i -g vansrouter",
-  installCmdLatest: "npm i -g vansrouter@latest --prefer-online",
+  npmPackageName: "xscope0-router",
+  installCmd: "npm i -g xscope0-router",
+  installCmdLatest: "npm i -g xscope0-router@latest --prefer-online",
   shutdownCountdownSec: 3,
   exitDelayMs: 500,
   statusPort: 20129,

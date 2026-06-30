@@ -114,8 +114,8 @@ export default function PiToolCard({ tool, baseUrl, apiKeys, activeProviders = [
             <p className="text-xs text-text-muted truncate">{tool.description}</p>
           </div>
         </div>
-        <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${status?.installed === false ? "bg-red-500/10 text-red-600" : status?.hasVansRoute ? "bg-green-500/10 text-green-600" : "bg-yellow-500/10 text-yellow-600"}`}>
-          {status?.installed === false ? "Uninstalled" : status?.hasVansRoute ? "Configured" : "Not configured"}
+        <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${status?.installed === false ? "bg-red-500/10 text-red-600" : status?.hasRouterConfig ? "bg-green-500/10 text-green-600" : "bg-yellow-500/10 text-yellow-600"}`}>
+          {status?.installed === false ? "Uninstalled" : status?.hasRouterConfig ? "Configured" : "Not configured"}
         </span>
       </div>
 

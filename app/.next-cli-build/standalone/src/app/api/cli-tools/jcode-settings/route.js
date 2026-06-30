@@ -44,7 +44,7 @@ const readConfig = async () => {
   }
 };
 
-const hasVansRouteConfig = (config) => {
+const hasRouterConfig = (config) => {
   if (!config || !config.providers) return false;
 
   const providers = config.providers;
@@ -119,12 +119,12 @@ export async function GET() {
   }
 
   const config = await readConfig();
-  const hasVansRoute = hasVansRouteConfig(config);
+  const hasRouterConfig = hasRouterConfig(config);
 
   return NextResponse.json({
     installed: true,
     config,
-    hasVansRoute,
+    hasRouterConfig,
     configPath: getConfigPath(),
   });
 }
