@@ -2,13 +2,17 @@
   <img src="assets/logo.png" alt="xscope0 Router" width="120">
   <h1>xscope0 Router</h1>
   <p><strong>AI API proxy engine with provider failover, token compression, and circuit breaking.</strong></p>
-  <p>Route requests from any CLI tool through a single unified endpoint. Supports Claude Code, Codex, Cursor, Cline, OpenCode, and any OpenAI-compatible client.</p>
-  <p>Features automatic provider rotation, circuit breaking, account pooling, token compression (RTK / Caveman / Ponytail), format translation between protocols, and proxy pool management with auto-rotation on errors.</p>
+  <p>A local proxy server that sits between your CLI tool and AI providers. It translates request formats, rotates accounts when rate-limited, compresses tokens to save costs, and fails over to the next provider when one goes down. No telemetry. No external servers. Everything runs on your machine.</p>
+  <p>Works with Claude Code, Codex, Cursor, Cline, OpenCode, and any OpenAI-compatible client. Supports Kimchi, AgentRouter, GitHub Copilot, Gemini, OpenRouter, NVIDIA, and more.</p>
 
   <a href="https://github.com/xscope0/xScope0-Router/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/xscope0/xScope0-Router?style=flat-square"></a>
   <a href="https://github.com/xscope0/xScope0-Router/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
   <a href="https://github.com/xscope0/xScope0-Router/pulls"><img alt="PRs" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square"></a>
   <a href="https://github.com/xscope0/xScope0-Router/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/xscope0/xScope0-Router?style=flat-square"></a>
+
+  <br><br>
+
+  <a href="#">🇮🇩 Bahasa Indonesia</a> · <a href="#">🇻🇳 Tiếng Việt</a> · <a href="#">🇨🇳 中文</a> · <a href="#">🇯🇵 日本語</a> · <a href="#">🇷🇺 Русский</a>
 </div>
 
 ---
