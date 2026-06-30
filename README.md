@@ -36,9 +36,8 @@
 ---
 
 <div align="center">
-  <img src="assets/preview/preview-2.png" alt="Dashboard" width="32%">
-  <img src="assets/preview/preview-3.png" alt="Providers" width="32%">
-  <img src="assets/preview/preview-4.png" alt="Settings" width="32%">
+  <img src="assets/preview/preview-2.png" alt="Dashboard" width="48%">
+  <img src="assets/preview/preview-4.png" alt="Settings" width="48%">
 </div>
 
 ---
