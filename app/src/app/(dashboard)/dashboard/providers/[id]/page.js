@@ -302,6 +302,18 @@ export default function ProviderDetailPage() {
       setLoading(false);
     }
   }, [providerId, isCompatible]);
+  const refreshProviderConnections = useCallback(async () => {
+    try {
+      const res = await fetch("/api/providers", { cache: "no-store" });
+      if (!res.ok) return;
+      const data = await res.json();
+      const filtered = (data.connections || []).filter(c => c.provider === providerId);
+      setConnections(filtered);
+    } catch (error) {
+      console.log("Error refreshing connections:", error);
+    }
+  }, [providerId]);
+
 
   const handleUpdateNode = async (formData) => {
     try {
@@ -435,6 +447,19 @@ export default function ProviderDetailPage() {
     fetchCustomModels();
     fetchDisabledModels();
   }, [fetchConnections, fetchAliases, fetchCustomModels, fetchDisabledModels]);
+
+  useEffect(() => {
+    if (!providerAutoDeactivate) return;
+    const interval = window.setInterval(refreshProviderConnections, 750);
+    const handleFocus = () => refreshProviderConnections();
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [providerAutoDeactivate, refreshProviderConnections]);
 
   // Fetch suggested models from provider's public API (if configured)
   useEffect(() => {
