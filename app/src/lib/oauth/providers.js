@@ -32,6 +32,10 @@ function newZCodeRequestId() {
   return crypto.randomUUID();
 }
 
+function getCodeBuddyDomain(config) {
+  return new URL(config.baseUrl).hostname;
+}
+
 import { generatePKCE, generateState } from "./utils/pkce";
 import {
   CLAUDE_CONFIG,
@@ -51,6 +55,7 @@ import {
   CLINE_CONFIG,
   GITLAB_CONFIG,
   CODEBUDDY_CONFIG,
+  CODEBUDDY_CN_CONFIG,
   ZAI_CONFIG,
 } from "./constants/oauth";
 import { XAI_CONFIG, XAI_PKCE_VERIFIER_BYTES } from "./constants/xai";
@@ -1217,7 +1222,7 @@ const PROVIDERS = {
           Accept: "application/json",
           "User-Agent": config.userAgent,
           "X-Requested-With": "XMLHttpRequest",
-          "X-Domain": "copilot.tencent.com",
+          "X-Domain": getCodeBuddyDomain(config),
           "X-No-Authorization": "true",
           "X-No-User-Id": "true",
           "X-Product": "SaaS",
@@ -1246,7 +1251,7 @@ const PROVIDERS = {
           Accept: "application/json",
           "User-Agent": config.userAgent,
           "X-Requested-With": "XMLHttpRequest",
-          "X-Domain": "copilot.tencent.com",
+          "X-Domain": getCodeBuddyDomain(config),
           "X-No-Authorization": "true",
           "X-No-User-Id": "true",
           "X-No-Enterprise-Id": "true",
@@ -1284,7 +1289,7 @@ const PROVIDERS = {
   // 2. Open authUrl in browser
   // 3. Poll tokenUrl with state until success (code 0) or timeout
   "codebuddy-cn": {
-    config: CODEBUDDY_CONFIG,
+    config: CODEBUDDY_CN_CONFIG,
     flowType: "device_code",
     requestDeviceCode: async (config) => {
       const response = await fetch(`${config.stateUrl}?platform=${config.platform}`, {
@@ -1294,7 +1299,7 @@ const PROVIDERS = {
           Accept: "application/json",
           "User-Agent": config.userAgent,
           "X-Requested-With": "XMLHttpRequest",
-          "X-Domain": "copilot.tencent.com",
+          "X-Domain": getCodeBuddyDomain(config),
           "X-No-Authorization": "true",
           "X-No-User-Id": "true",
           "X-Product": "SaaS",
@@ -1323,7 +1328,7 @@ const PROVIDERS = {
           Accept: "application/json",
           "User-Agent": config.userAgent,
           "X-Requested-With": "XMLHttpRequest",
-          "X-Domain": "copilot.tencent.com",
+          "X-Domain": getCodeBuddyDomain(config),
           "X-No-Authorization": "true",
           "X-No-User-Id": "true",
           "X-No-Enterprise-Id": "true",
