@@ -1,19 +1,37 @@
-<div align="center">
-  <img src="assets/logo.png" alt="xscope0 Router" width="120">
-  <h1>xscope0 Router</h1>
-  <p><strong>AI API proxy engine with provider failover, token compression, and circuit breaking.</strong></p>
-  <p>A local proxy server that sits between your CLI tool and AI providers. It translates request formats, rotates accounts when rate-limited, compresses tokens to save costs, and fails over to the next provider when one goes down. No telemetry. No external servers. Everything runs on your machine.</p>
-  <p>Works with Claude Code, Codex, Cursor, Cline, OpenCode, and any OpenAI-compatible client. Supports Kimchi, AgentRouter, GitHub Copilot, Gemini, OpenRouter, NVIDIA, and more.</p>
+<p align="center">
+  <img src="assets/logo.png" width="256" alt="xscope0 Router Logo">
+</p>
 
-  <a href="https://github.com/xscope0/xScope0-Router/releases/latest"><img alt="Release" src="https://img.shields.io/github/v/release/xscope0/xScope0-Router?style=flat-square"></a>
-  <a href="https://github.com/xscope0/xScope0-Router/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
+<h1 align="center">xscope0 Router</h1>
+
+<p align="center">
+  AI API proxy engine with provider failover, token compression, and circuit breaking.<br>
+  Sits between your CLI tool and AI providers. Translates formats, rotates accounts, compresses tokens.<br>
+  No telemetry. No external servers. Everything runs locally.
+</p>
+
+<p align="center">
+  <a href="https://github.com/xscope0/xScope0-Router/releases/latest"><img alt="version" src="https://img.shields.io/github/v/release/xscope0/xScope0-Router?style=flat-square"></a>
+  <a href="https://github.com/xscope0/xScope0-Router/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/badge/license-MIT-green?style=flat-square"></a>
   <a href="https://github.com/xscope0/xScope0-Router/pulls"><img alt="PRs" src="https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square"></a>
-  <a href="https://github.com/xscope0/xScope0-Router/network/members"><img alt="Forks" src="https://img.shields.io/github/forks/xscope0/xScope0-Router?style=flat-square"></a>
+  <img alt="node" src="https://img.shields.io/badge/node-18+-339933?style=flat-square&logo=node.js&logoColor=white">
+  <a href="https://github.com/xscope0/xScope0-Router/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/xscope0/xScope0-Router?style=flat-square&logo=github"></a>
+  <a href="https://github.com/xscope0/xScope0-Router/network/members"><img alt="forks" src="https://img.shields.io/github/forks/xscope0/xScope0-Router?style=flat-square&logo=github"></a>
+  <a href="https://github.com/xscope0/xScope0-Router/issues"><img alt="issues" src="https://img.shields.io/github/issues/xscope0/xScope0-Router?style=flat-square&logo=github"></a>
+  <img alt="platform" src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square">
+</p>
 
-  <br><br>
+<p align="center">
+  <a href="#quick-start"><img src="https://img.shields.io/badge/🚀_Quick_Start-2ea44f?style=flat-square" alt="Quick Start"></a>
+  <a href="#how-it-works"><img src="https://img.shields.io/badge/⚙️_Architecture-58a6ff?style=flat-square" alt="Architecture"></a>
+  <a href="#providers"><img src="https://img.shields.io/badge/🔌_Providers-F78C40?style=flat-square" alt="Providers"></a>
+  <a href="#features"><img src="https://img.shields.io/badge/✨_Features-d73a4a?style=flat-square" alt="Features"></a>
+  <a href="#build"><img src="https://img.shields.io/badge/🔨_Build-8b949e?style=flat-square" alt="Build"></a>
+</p>
 
+<p align="center">
   <a href="docs/id.md">🇮🇩 Bahasa Indonesia</a> · <a href="docs/vi.md">🇻🇳 Tiếng Việt</a> · <a href="docs/zh.md">🇨🇳 中文</a> · <a href="docs/ja.md">🇯🇵 日本語</a> · <a href="docs/ru.md">🇷🇺 Русский</a>
-</div>
+</p>
 
 ---
 
@@ -22,6 +40,27 @@
   <img src="assets/preview/preview-3.png" alt="Providers" width="32%">
   <img src="assets/preview/preview-4.png" alt="Settings" width="32%">
 </div>
+
+---
+
+## Quick Start
+
+```bash
+npm install -g xscope0-modifed-router
+xscope0-router
+```
+
+Or run directly:
+
+```bash
+npx xscope0-modifed-router
+```
+
+| Endpoint | URL |
+|----------|-----|
+| **Dashboard** | `http://localhost:20128/dashboard` |
+| **API** | `http://localhost:20128/v1` |
+| **Health** | `http://localhost:20128/health` |
 
 ---
 
@@ -74,26 +113,6 @@
 | **OpenRouter** | API key | 100+ models | Pay-per-token |
 | **NVIDIA** | API key | NIM endpoints | Pay-per-token |
 | **Combo** | — | Aggregated | Fallback / round-robin / fusion / capacity |
-
----
-
-## Install
-
-```bash
-npm install -g xscope0-modifed-router
-xscope0-router
-```
-
-```bash
-# or just run directly
-npx xscope0-modifed-router
-```
-
-| Endpoint | URL |
-|----------|-----|
-| **Dashboard** | `http://localhost:20128/dashboard` |
-| **API** | `http://localhost:20128/v1` |
-| **Health** | `http://localhost:20128/health` |
 
 ---
 
@@ -174,6 +193,14 @@ MIT — Original project: [9router](https://github.com/decolua/9router)
 
 ---
 
-<div align="center">
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=node.js&logoColor=white">
+  <img src="https://img.shields.io/badge/SQLite-embedded-003B57?style=flat-square&logo=sqlite&logoColor=white">
+  <img src="https://img.shields.io/badge/Next.js-dashboard-000000?style=flat-square&logo=next.js&logoColor=white">
+  <img src="https://img.shields.io/badge/Express-API-000000?style=flat-square&logo=express&logoColor=white">
+  <img src="https://img.shields.io/badge/esbuild-bundler-FFCF00?style=flat-square&logo=esbuild&logoColor=black">
+</p>
+
+<p align="center">
   <sub>Built by <a href="https://github.com/xscope0">xscope0</a></sub>
-</div>
+</p>
