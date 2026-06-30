@@ -260,6 +260,23 @@ export default function ProxyPoolsPage() {
     }
   };
 
+  const deleteProxyPools = async (ids) => {
+    const results = await Promise.all(ids.map(async (id) => {
+      try {
+        const res = await fetch(`/api/proxy-pools/${id}`, { method: "DELETE" });
+        if (res.ok) return "ok";
+        if (res.status === 409) return "blocked";
+        return "fail";
+      } catch { return "fail"; }
+    }));
+    const ok = results.filter(r => r === "ok").length;
+    const blocked = results.filter(r => r === "blocked").length;
+    const failed = results.filter(r => r === "fail").length;
+    await fetchProxyPools();
+    clearSelection();
+    notify.success(`Deleted ${ok}${blocked ? `, ${blocked} bound` : ""}${failed ? `, ${failed} failed` : ""}`);
+  };
+
   const bulkDelete = async () => {
     if (selectedIds.length === 0) return;
     setConfirmState({
@@ -269,20 +286,25 @@ export default function ProxyPoolsPage() {
         setConfirmState(null);
         setBulkBusy(true);
         try {
-          const results = await Promise.all(selectedIds.map(async (id) => {
-            try {
-              const res = await fetch(`/api/proxy-pools/${id}`, { method: "DELETE" });
-              if (res.ok) return "ok";
-              if (res.status === 409) return "blocked";
-              return "fail";
-            } catch { return "fail"; }
-          }));
-          const ok = results.filter(r => r === "ok").length;
-          const blocked = results.filter(r => r === "blocked").length;
-          const failed = results.filter(r => r === "fail").length;
-          await fetchProxyPools();
-          clearSelection();
-          notify.success(`Deleted ${ok}${blocked ? `, ${blocked} bound` : ""}${failed ? `, ${failed} failed` : ""}`);
+          await deleteProxyPools(selectedIds);
+        } finally {
+          setBulkBusy(false);
+        }
+      }
+    });
+  };
+
+  const bulkDeleteInactive = async () => {
+    const inactiveIds = proxyPools.filter((pool) => pool.isActive !== true).map((pool) => pool.id);
+    if (inactiveIds.length === 0) return;
+    setConfirmState({
+      title: "Delete Inactive Proxy Pools",
+      message: `Delete ${inactiveIds.length} inactive proxy pool(s)?`,
+      onConfirm: async () => {
+        setConfirmState(null);
+        setBulkBusy(true);
+        try {
+          await deleteProxyPools(inactiveIds);
         } finally {
           setBulkBusy(false);
         }
@@ -547,6 +569,7 @@ export default function ProxyPoolsPage() {
     () => proxyPools.filter((pool) => pool.isActive === true).length,
     [proxyPools]
   );
+  const inactiveCount = proxyPools.length - activeCount;
 
   if (loading) {
     return (
@@ -636,6 +659,18 @@ export default function ProxyPoolsPage() {
           )}
           <Badge variant="default">Total: {proxyPools.length}</Badge>
           <Badge variant="success">Active: {activeCount}</Badge>
+          <Badge variant="default">Inactive: {inactiveCount}</Badge>
+          {inactiveCount > 0 && (
+            <Button
+              size="sm"
+              variant="danger"
+              icon="delete_sweep"
+              onClick={bulkDeleteInactive}
+              disabled={bulkBusy || healthChecking}
+            >
+              Delete Inactive
+            </Button>
+          )}
         </div>
 
         {(selectedIds.length > 0 || healthChecking) && (
