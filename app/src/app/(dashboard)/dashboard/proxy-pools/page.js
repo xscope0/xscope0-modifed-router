@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Badge, Button, Card, CardSkeleton, Input, Modal, Toggle, ConfirmModal } from "@/shared/components";
 import { useNotificationStore } from "@/store/notificationStore";
-import { summarizeProxyHealthResults } from "./utils";
+import { getSmartHealthIntervalMs, SMART_HEALTH_INTERVAL_OPTIONS, summarizeProxyHealthResults } from "./utils";
 
 function parseProxyLine(line) {
   const trimmed = line.trim();
@@ -72,6 +72,7 @@ export default function ProxyPoolsPage() {
   const [selectedIds, setSelectedIds] = useState([]);
   const [healthChecking, setHealthChecking] = useState(false);
   const [healthProgress, setHealthProgress] = useState({ current: 0, total: 0 });
+  const [smartHealthIntervalMinutes, setSmartHealthIntervalMinutes] = useState(0);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [confirmState, setConfirmState] = useState(null);
   const relayMenuRef = useRef(null);
@@ -106,6 +107,12 @@ export default function ProxyPoolsPage() {
   useEffect(() => {
     fetchProxyPools();
   }, [fetchProxyPools]);
+  useEffect(() => {
+    const saved = Number(localStorage.getItem("smartHealthIntervalMinutes") || 0);
+    if (getSmartHealthIntervalMs(saved) > 0) {
+      setSmartHealthIntervalMinutes(saved);
+    }
+  }, []);
 
   const resetForm = () => {
     setEditingProxyPool(null);
@@ -366,6 +373,26 @@ export default function ProxyPoolsPage() {
       notify.success(`SmartHealth done. Alive: ${alive}, Dead: ${deadIds.length}`);
     }
   };
+
+  const updateSmartHealthInterval = (value) => {
+    const minutes = Number(value || 0);
+    const nextMinutes = getSmartHealthIntervalMs(minutes) > 0 ? minutes : 0;
+    setSmartHealthIntervalMinutes(nextMinutes);
+    if (nextMinutes > 0) {
+      localStorage.setItem("smartHealthIntervalMinutes", String(nextMinutes));
+    } else {
+      localStorage.removeItem("smartHealthIntervalMinutes");
+    }
+  };
+
+  useEffect(() => {
+    const intervalMs = getSmartHealthIntervalMs(smartHealthIntervalMinutes);
+    if (intervalMs === 0 || proxyPools.length === 0 || healthChecking || bulkBusy) return undefined;
+    const timer = setInterval(() => {
+      void handleHealthCheck();
+    }, intervalMs);
+    return () => clearInterval(timer);
+  }, [smartHealthIntervalMinutes, proxyPools.length, healthChecking, bulkBusy]);
 
   const openBatchImportModal = () => {
     setBatchImportText("");
@@ -631,6 +658,17 @@ export default function ProxyPoolsPage() {
             )}
           </div>
 
+          <select
+            value={smartHealthIntervalMinutes}
+            onChange={(event) => updateSmartHealthInterval(event.target.value)}
+            className="rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text-main"
+            aria-label="SmartHealth schedule"
+          >
+            <option value={0}>SmartHealth: manual</option>
+            {SMART_HEALTH_INTERVAL_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
           <Button size="sm" variant="secondary" icon="health_and_safety" onClick={handleHealthCheck} disabled={healthChecking || bulkBusy}>
             {healthChecking ? `SmartHealth ${healthProgress.current}/${healthProgress.total}` : "SmartHealth"}
           </Button>

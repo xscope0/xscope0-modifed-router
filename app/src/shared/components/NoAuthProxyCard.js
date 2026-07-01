@@ -85,7 +85,6 @@ export default function NoAuthProxyCard({ providerId }) {
           ...proxyPools.map((pool) => ({ value: pool.id, label: pool.name })),
         ]}
       />
-      {["mimo-free", "opencode"].includes(providerId) && (
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           <Select
             label="Auto-rotate"
@@ -109,7 +108,6 @@ export default function NoAuthProxyCard({ providerId }) {
           </button>
 
         </div>
-      )}
     </Card>
   );
 }

@@ -993,7 +993,7 @@ export default function ProviderDetailPage() {
                 onMoveDown={() => handleSwapPriority(index, index + 1)}
                 onToggleActive={(isActive) => handleUpdateConnectionStatus(conn.id, isActive)}
                 onUpdateProviderData={(patch) => handleUpdateProviderData(conn, patch)}
-                showProxyAutomation={["mimo-free", "opencode"].includes(providerId)}
+                showProxyAutomation={true}
                 showDelete={providerId !== "kiro" || conn.isActive === false}
                 autoPing={providerId === "claude" && conn.authType === "oauth" ? {
                   on: autoPing.connections[conn.id] === true,

@@ -4,7 +4,11 @@ import {
   getRefreshIntervalSeconds,
   shouldFetchQuotaOnTick,
 } from "../src/app/(dashboard)/dashboard/usage/components/ProviderLimits/utils.js";
-import { summarizeProxyHealthResults } from "../src/app/(dashboard)/dashboard/proxy-pools/utils.js";
+import {
+  SMART_HEALTH_INTERVAL_OPTIONS,
+  getSmartHealthIntervalMs,
+  summarizeProxyHealthResults,
+} from "../src/app/(dashboard)/dashboard/proxy-pools/utils.js";
 import { resolveConnectionProxyUrls, shouldRetryProxyResponse } from "../open-sse/utils/proxyFetch.js";
 
 describe("quota refresh intervals", () => {
@@ -51,5 +55,12 @@ describe("proxy SmartHealth", () => {
       { id: "b", ok: false },
       { id: "c", ok: false },
     ])).toEqual({ alive: 1, deadIds: ["b", "c"] });
+  });
+
+  test("supports scheduled health intervals", () => {
+    expect(SMART_HEALTH_INTERVAL_OPTIONS.map((option) => option.value)).toEqual([15, 30, 60, 360, 720, 1440]);
+    expect(getSmartHealthIntervalMs(15)).toBe(15 * 60 * 1000);
+    expect(getSmartHealthIntervalMs("60")).toBe(60 * 60 * 1000);
+    expect(getSmartHealthIntervalMs(999)).toBe(0);
   });
 });

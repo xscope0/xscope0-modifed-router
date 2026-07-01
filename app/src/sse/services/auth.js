@@ -394,7 +394,6 @@ export async function isValidApiKey(apiKey) {
  * accepted as a match — the UUID-suffixed id is not user-meaningful and
  * /v1/models lists these under their prefix alias.
  */
-const ROTATE_PROXY_PROVIDERS = new Set(["mimo-free", "opencode"]);
 
 async function shouldAutoDeactivate(conn, provider) {
   if (conn?.providerSpecificData?.autoDeactivateOnError === true) return true;
@@ -425,14 +424,14 @@ async function rotateProxy(conn, provider) {
 }
 
 async function maybeRotateProxyOnError(conn, provider) {
-  if (!ROTATE_PROXY_PROVIDERS.has(provider) || conn?.providerSpecificData?.autoRotateProxyOnError !== true) return;
+  if (conn?.providerSpecificData?.autoRotateProxyOnError !== true) return;
   await rotateProxy(conn, provider);
 }
 
 async function maybeRotateProxyByTimer(conn, provider) {
   const data = conn?.providerSpecificData || {};
   const minutes = Number(data.autoRotateProxyMinutes || 0);
-  if (!ROTATE_PROXY_PROVIDERS.has(provider) || ![5, 10, 15].includes(minutes)) return conn;
+  if (![5, 10, 15].includes(minutes)) return conn;
   const last = data.lastProxyRotateAt ? new Date(data.lastProxyRotateAt).getTime() : 0;
   if (last && Date.now() - last < minutes * 60 * 1000) return conn;
   return rotateProxy(conn, provider);
