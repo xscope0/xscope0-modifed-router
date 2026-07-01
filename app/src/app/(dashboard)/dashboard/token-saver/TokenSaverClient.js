@@ -7,6 +7,7 @@ import { getCurrentLocale, onLocaleChange } from "@/i18n/runtime";
 import {
   WENYAN_LOCALES,
   CAVEMAN_LEVELS,
+  TERSE_LEVELS,
   PONYTAIL_LEVELS,
 } from "../endpoint/endpointConstants";
 
@@ -24,6 +25,8 @@ export default function TokenSaverClient() {
     useState(false);
   const [headroomActionLoading, setHeadroomActionLoading] = useState(false);
   const [headroomActionError, setHeadroomActionError] = useState("");
+  const [terseEnabled, setTerseEnabled] = useState(false);
+  const [terseLevel, setTerseLevel] = useState("medium");
   const [cavemanEnabled, setCavemanEnabled] = useState(false);
   const [cavemanLevel, setCavemanLevel] = useState("full");
   const [ponytailEnabled, setPonytailEnabled] = useState(false);
@@ -73,6 +76,16 @@ export default function TokenSaverClient() {
     } catch (error) {
       console.log("Error updating rtkEnabled:", error);
     }
+  };
+
+  const handleTerseEnabled = (value) => {
+    setTerseEnabled(value);
+    patchSetting({ terseEnabled: value });
+  };
+
+  const handleTerseLevel = (level) => {
+    setTerseLevel(level);
+    patchSetting({ terseLevel: level });
   };
 
   const handleCavemanEnabled = (value) => {
@@ -161,6 +174,8 @@ export default function TokenSaverClient() {
           setRtkEnabledState(data.rtkEnabled !== false);
           setHeadroomEnabled(!!data.headroomEnabled);
           setHeadroomUrl(data.headroomUrl || "http://localhost:8787");
+          setTerseEnabled(!!data.terseEnabled);
+          setTerseLevel(data.terseLevel || "medium");
           setCavemanEnabled(!!data.cavemanEnabled);
           setCavemanLevel(data.cavemanLevel || "full");
           setPonytailEnabled(!!data.ponytailEnabled);
@@ -256,6 +271,43 @@ export default function TokenSaverClient() {
             disabled={!headroomRunning}
             onChange={() => handleHeadroomEnabled(!headroomEnabled)}
           />
+        </div>
+        <div className="flex items-center justify-between py-4 border-b border-border gap-4 flex-wrap">
+          <div className="min-w-0 flex-1">
+            <p className="font-medium">Terse replies</p>
+            <p className="text-sm text-text-muted">
+              Bias the model toward concise answers without caveman style
+            </p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            {terseEnabled && (
+              <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-1.5">
+                  {TERSE_LEVELS.map((lvl) => (
+                    <button
+                      key={lvl.id}
+                      onClick={() => handleTerseLevel(lvl.id)}
+                      className={`px-3 py-1.5 rounded text-xs font-medium border transition-colors ${
+                        terseLevel === lvl.id
+                          ? "bg-primary text-white border-primary"
+                          : "bg-transparent border-border text-text-muted hover:bg-surface-2"
+                      }`}
+                      title={lvl.desc}
+                    >
+                      {lvl.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-primary">
+                  {TERSE_LEVELS.find((lvl) => lvl.id === terseLevel)?.desc}
+                </p>
+              </div>
+            )}
+            <Toggle
+              checked={terseEnabled}
+              onChange={() => handleTerseEnabled(!terseEnabled)}
+            />
+          </div>
         </div>
         <div className="flex items-center justify-between pt-4 gap-4 flex-wrap">
           <div className="min-w-0 flex-1">

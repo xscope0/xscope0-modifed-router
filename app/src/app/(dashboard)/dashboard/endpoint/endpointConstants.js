@@ -25,6 +25,12 @@ export const CAVEMAN_LEVELS = [
   { id: "wenyan-ultra", label: "文 Ultra", desc: "Extreme classical compression", wenyan: true },
 ];
 
+export const TERSE_LEVELS = [
+  { id: "light", label: "Light", desc: "Shorter, normal grammar" },
+  { id: "medium", label: "Medium", desc: "Fragments OK, less ceremony" },
+  { id: "aggressive", label: "Aggressive", desc: "Telegraphic, max brevity" },
+];
+
 export const PONYTAIL_LEVELS = [
   { id: "lite", label: "Lite", desc: "Build asked, name lazier option" },
   { id: "full", label: "Full", desc: "Ladder enforced: stdlib/native first" },

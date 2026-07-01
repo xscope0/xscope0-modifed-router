@@ -428,6 +428,8 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
       headroomEnabled: chatSettings.headroomEnabled === true,
       headroomUrl: chatSettings.headroomUrl || DEFAULT_HEADROOM_URL,
       headroomCompressUserMessages: chatSettings.headroomCompressUserMessages === true,
+      terseEnabled: chatSettings.terseEnabled === true,
+      terseLevel: chatSettings.terseLevel || "medium",
       cavemanEnabled: chatSettings.cavemanEnabled === true,
       cavemanLevel: chatSettings.cavemanLevel || "full",
       ponytailEnabled: chatSettings.ponytailEnabled === true,
