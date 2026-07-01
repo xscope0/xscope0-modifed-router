@@ -4,7 +4,10 @@ const crypto = require("crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const os = require("node:os");
-const { machineIdSync } = require("node-machine-id");
+let machineIdSync = null;
+try {
+  ({ machineIdSync } = require("node-machine-id"));
+} catch {}
 
 // Default configuration
 const DEFAULT_CONFIG = {
@@ -39,7 +42,7 @@ function loadRawMachineId() {
     const raw = fs.readFileSync(MACHINE_ID_FILE, "utf8").trim();
     if (raw) return raw;
   } catch {}
-  try { return machineIdSync(); } catch { return ""; }
+  try { return machineIdSync ? machineIdSync() : ""; } catch { return ""; }
 }
 
 // Random secret shared with server via file → token unpredictable from machineId alone.
