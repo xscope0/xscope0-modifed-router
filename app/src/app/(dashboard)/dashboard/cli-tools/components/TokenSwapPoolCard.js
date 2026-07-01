@@ -965,7 +965,7 @@ export default function TokenSwapPoolCard({ tool, connections = [], serverRunnin
                   );
                 })}
                 <Link
-                  href="/dashboard/providers"
+                  href={`/dashboard/providers/${tool.tokenSwapProvider || tool.id}`}
                   className="text-[11px] text-primary hover:underline flex items-center gap-1 px-1 mt-1"
                 >
                   <span className="material-symbols-outlined text-[12px]">open_in_new</span>
@@ -976,7 +976,7 @@ export default function TokenSwapPoolCard({ tool, connections = [], serverRunnin
               <div className="px-1">
                 <p className="text-xs text-text-muted">
                   No active {tool.name} accounts in pool.{" "}
-                  <Link href="/dashboard/providers" className="text-primary hover:underline">
+                  <Link href={`/dashboard/providers/${tool.tokenSwapProvider || tool.id}`} className="text-primary hover:underline">
                     Add account →
                   </Link>
                 </p>
