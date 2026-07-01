@@ -1,0 +1,11 @@
+{
+  "name": "multi-whatsapp-ghost-preload",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Documented preload and ASAR patch map for Multi WhatsApp ghost privacy hooks.",
+  "scripts": {
+    "check": "node --check patched/vite-build/view-preload.js && node --check patched/vite-build/main.js && node --check patched/vite-build/ghost-hooks.js && node --check patched/vite-build/ghost-meta-hooks.js",
+    "install:mac": "node scripts/install-patched-asar.mjs"
+  }
+}
