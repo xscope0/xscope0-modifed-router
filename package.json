@@ -1,7 +1,7 @@
 {
-  "name": "xscope0-modifed-router",
+  "name": "xscope0",
   "version": "0.7.4",
-  "description": "xscope0 Modifed Router - fork of 9router with extra provider automation",
+  "description": "xScope0 Router - fork of 9router with extra provider automation",
   "bin": {
     "9router": "./cli.js",
     "xscope0-router": "./cli.js"

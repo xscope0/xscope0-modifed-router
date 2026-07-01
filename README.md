@@ -45,14 +45,14 @@
 ## Quick Start
 
 ```bash
-npm install -g xscope0-modifed-router
+npm install -g xscope0
 xscope0-router
 ```
 
 Or run directly:
 
 ```bash
-npx xscope0-modifed-router
+npx xscope0
 ```
 
 | Endpoint | URL |
