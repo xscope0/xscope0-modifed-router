@@ -91,9 +91,18 @@ export function reorderByCapabilities(models, required) {
 
 /**
  * Track rotation state per combo (for round-robin strategy)
+ * LRU-capped to prevent unbounded growth
  * @type {Map<string, { index: number, consecutiveUseCount: number }>}
  */
+const MAX_COMBO_ROTATION_ENTRIES = 1000;
 const comboRotationState = new Map();
+
+function pruneOldestComboRotationEntry() {
+  if (comboRotationState.size >= MAX_COMBO_ROTATION_ENTRIES) {
+    const firstKey = comboRotationState.keys().next().value;
+    if (firstKey !== undefined) comboRotationState.delete(firstKey);
+  }
+}
 
 // Trailing run of items after the last assistant/model turn = the current user
 // turn. It may span several messages (e.g. text + image split across blocks),
@@ -183,6 +192,7 @@ export function getRotatedModels(models, comboName, strategy, stickyLimit = 1) {
   const rotatedModels = rotateModelsFromIndex(models, currentIndex);
   const nextUseCount = state.consecutiveUseCount + 1;
 
+  pruneOldestComboRotationEntry();
   if (nextUseCount >= normalizedStickyLimit) {
     comboRotationState.set(rotationKey, {
       index: (currentIndex + 1) % models.length,
@@ -435,16 +445,32 @@ const FUSION_DEFAULTS = {
   minPanel: 2,             // answers needed before stragglers get a grace window
   stragglerGraceMs: 8000,  // wait this long for laggards once quorum is reached
   panelHardTimeoutMs: 90000, // absolute cap so one hung model can't stall forever
+  maxPanelModels: 3,       // cap fan-out so a combo cannot multiply one request into a storm
+  maxPanelAnswerChars: 12000,
 };
 
-// Resolve a Response (or {__error}) within ms; the loser keeps running but is ignored.
-function withTimeout(promise, ms) {
+// Resolve a Response (or {__error}) within ms and abort panel work on timeout.
+function withTimeout(promise, ms, onTimeout) {
   return new Promise((resolve) => {
-    const t = setTimeout(() => resolve({ __timeout: true }), ms);
+    const t = setTimeout(() => {
+      onTimeout?.();
+      resolve({ __timeout: true });
+    }, ms);
     Promise.resolve(promise)
       .then((v) => { clearTimeout(t); resolve(v); })
       .catch((e) => { clearTimeout(t); resolve({ __error: e }); });
   });
+}
+
+function boundedPositiveInt(value, fallback, min, max) {
+  const parsed = Number.parseInt(value, 10);
+  const safe = Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+  return Math.min(max, Math.max(min, safe));
+}
+
+function truncatePanelAnswer(text, maxChars) {
+  if (!text || text.length <= maxChars) return text || "";
+  return `${text.slice(0, maxChars)}\n\n[truncated ${text.length - maxChars} chars before judge synthesis]`;
 }
 
 /**
@@ -507,7 +533,11 @@ function collectPanel(calls, { minPanel, stragglerGraceMs, panelHardTimeoutMs })
  * @returns {Promise<Response>}
  */
 export async function handleFusionChat({ body, models, handleSingleModel, log, comboName, judgeModel, tuning }) {
-  const panel = Array.isArray(models) ? models.filter(Boolean) : [];
+  const rawPanel = Array.isArray(models) ? models.filter(Boolean) : [];
+  const cfg = { ...FUSION_DEFAULTS, ...(tuning || {}) };
+  const maxPanelModels = boundedPositiveInt(cfg.maxPanelModels, FUSION_DEFAULTS.maxPanelModels, 1, 6);
+  const maxPanelAnswerChars = boundedPositiveInt(cfg.maxPanelAnswerChars, FUSION_DEFAULTS.maxPanelAnswerChars, 1000, 40000);
+  const panel = rawPanel.slice(0, maxPanelModels);
   if (panel.length === 0) {
     return new Response(
       JSON.stringify({ error: { message: "Fusion combo has no models" } }),
@@ -520,10 +550,10 @@ export async function handleFusionChat({ body, models, handleSingleModel, log, c
     return handleSingleModel(body, panel[0]);
   }
 
-  const cfg = { ...FUSION_DEFAULTS, ...(tuning || {}) };
   const minPanel = Math.min(Math.max(2, cfg.minPanel), panel.length);
   const judge = judgeModel && judgeModel.trim() ? judgeModel.trim() : panel[0];
-  log.info("FUSION", `Combo "${comboName}" | panel=${panel.length} [${panel.join(", ")}] | judge=${judge} | quorum=${minPanel}`);
+  const cappedSuffix = rawPanel.length > panel.length ? ` | capped=${panel.length}/${rawPanel.length}` : "";
+  log.info("FUSION", `Combo "${comboName}" | panel=${panel.length} [${panel.join(", ")}] | judge=${judge} | quorum=${minPanel}${cappedSuffix}`);
 
   // 1. Fan out to the panel in parallel: non-streaming, tools stripped (we want prose).
   const { tools, tool_choice, ...rest } = body;
@@ -537,8 +567,16 @@ export async function handleFusionChat({ body, models, handleSingleModel, log, c
   }
 
   const t0 = Date.now();
-  const calls = panel.map((m) => withTimeout(handleSingleModel(panelBody, m, true), cfg.panelHardTimeoutMs));
+  const panelControllers = panel.map(() => new AbortController());
+  const calls = panel.map((m, i) => withTimeout(
+    handleSingleModel(panelBody, m, true, panelControllers[i].signal),
+    cfg.panelHardTimeoutMs,
+    () => panelControllers[i].abort()
+  ));
   const settled = await collectPanel(calls, { ...cfg, minPanel });
+  panelControllers.forEach((controller, i) => {
+    if (!settled[i]) controller.abort();
+  });
   log.info("FUSION", `fan-out collected in ${Date.now() - t0}ms`);
 
   // 2. Collect successful answers.
@@ -554,7 +592,7 @@ export async function handleFusionChat({ body, models, handleSingleModel, log, c
       const json = await res.clone().json();
       const text = extractPanelText(json);
       if (text) {
-        answers.push({ model, text });
+        answers.push({ model, text: truncatePanelAnswer(text, maxPanelAnswerChars) });
         log.info("FUSION", `Panel ${model} ok (${text.length} chars)`);
       } else {
         log.warn("FUSION", `Panel ${model} returned empty content`);
