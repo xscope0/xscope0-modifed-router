@@ -43,6 +43,10 @@ const ALWAYS_PROTECTED = [
   "/api/oauth/cursor/auto-import",
   "/api/oauth/kiro/auto-import",
 ];
+const LOCAL_REAUTH_PATHS = [
+  "/api/settings/database",
+];
+
 
 const PROTECTED_API_PATHS = [
   "/api/settings",
@@ -195,6 +199,10 @@ export async function proxy(request) {
     if (!(await canAccessLocalOnlyRoute(request))) {
       return NextResponse.json({ error: "Local only: CLI token required" }, { status: 403 });
     }
+  }
+  // Local backup/import prompts for the dashboard password again in its handler.
+  if (LOCAL_REAUTH_PATHS.some((p) => pathname.startsWith(p)) && isLocalRequest(request)) {
+    return NextResponse.next();
   }
 
   // Always protected - require valid JWT or local CLI token (machineId-based)
