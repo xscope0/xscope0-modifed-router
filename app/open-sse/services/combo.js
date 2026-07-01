@@ -585,11 +585,12 @@ export async function handleFusionChat({ body, models, handleSingleModel, log, c
     const res = settled[i];
     const model = panel[i];
     if (!res) { log.warn("FUSION", `Panel ${model} dropped (straggler/timeout)`); continue; }
-    if (res.__timeout) { log.warn("FUSION", `Panel ${model} timed out`); continue; }
-    if (res.__error) { log.warn("FUSION", `Panel ${model} threw`, { error: res.__error?.message || String(res.__error) }); continue; }
-    if (!res.ok) { log.warn("FUSION", `Panel ${model} failed`, { status: res.status }); continue; }
+    if (res.__timeout) { settled[i] = null; log.warn("FUSION", `Panel ${model} timed out`); continue; }
+    if (res.__error) { settled[i] = null; log.warn("FUSION", `Panel ${model} threw`, { error: res.__error?.message || String(res.__error) }); continue; }
+    if (!res.ok) { settled[i] = null; log.warn("FUSION", `Panel ${model} failed`, { status: res.status }); continue; }
     try {
-      const json = await res.clone().json();
+      const json = await res.json();
+      settled[i] = null;
       const text = extractPanelText(json);
       if (text) {
         answers.push({ model, text: truncatePanelAnswer(text, maxPanelAnswerChars) });
@@ -598,6 +599,7 @@ export async function handleFusionChat({ body, models, handleSingleModel, log, c
         log.warn("FUSION", `Panel ${model} returned empty content`);
       }
     } catch (e) {
+      settled[i] = null;
       log.warn("FUSION", `Panel ${model} unparseable`, { error: e.message || String(e) });
     }
   }

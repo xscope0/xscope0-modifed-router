@@ -1,23 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { LOCALE_COOKIE, normalizeLocale } from "@/i18n/config";
-import { LOCALE_FLAGS } from "@/shared/constants/locales";
 import LanguageSwitcher from "./LanguageSwitcher";
-
-function getLocaleFromCookie() {
-  if (typeof document === "undefined") return "en";
-  const cookie = document.cookie
-    .split(";")
-    .find((c) => c.trim().startsWith(`${LOCALE_COOKIE}=`));
-  const value = cookie ? decodeURIComponent(cookie.split("=")[1]) : "en";
-  return normalizeLocale(value);
-}
 
 export default function HeaderLanguage() {
   const [open, setOpen] = useState(false);
-  const locale = getLocaleFromCookie();
-
   return (
     <>
       <button type="button"
@@ -26,16 +13,13 @@ export default function HeaderLanguage() {
         title="Language"
         data-i18n-skip="true"
       >
-        <span className="text-lg leading-none">{LOCALE_FLAGS[locale] || "🌐"}</span>
+        <span className="material-symbols-outlined text-[20px]">language</span>
       </button>
 
       <LanguageSwitcher
         hideTrigger
         isOpen={open}
-        onClose={(next) => {
-          setOpen(false);
-          setLocale(next);
-        }}
+        onClose={() => setOpen(false)}
       />
     </>
   );

@@ -111,20 +111,24 @@ export default function KeiUsageView({ period }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const controller = new AbortController();
     setLoading(true);
+    const es = new EventSource(`/api/usage/stream?period=${encodeURIComponent(period)}`);
 
-    fetch(`/api/usage/stats?period=${period}`, { signal: controller.signal })
-      .then((response) => response.ok ? response.json() : null)
-      .then((data) => {
-        if (!controller.signal.aborted) setStats(data);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!controller.signal.aborted) setLoading(false);
-      });
+    es.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        setStats(data);
+        setLoading(false);
+      } catch (err) {
+        console.error("[KeiUsageView] stream parse failed:", err);
+      }
+    };
 
-    return () => controller.abort();
+    es.onerror = () => {
+      setLoading(false);
+    };
+
+    return () => es.close();
   }, [period]);
 
   const providers = useMemo(() => buildProviderRows(stats), [stats]);
