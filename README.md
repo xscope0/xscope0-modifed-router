@@ -186,18 +186,6 @@ npm pack
 
 ---
 
-## Extra Package: Multi WhatsApp Ghost Preload Patch
-
-This repository also contains a documented local Electron patch at:
-
-```text
-packages/multi-whatsapp-ghost/
-```
-
-It maps patched files into `/Applications/Multi WhatsApp.app/Contents/Resources/app.asar/.vite/build/`, replacing repeat injection with persistent preload setter traps for WhatsApp Web ghost/privacy behavior. See [`packages/multi-whatsapp-ghost/README.md`](packages/multi-whatsapp-ghost/README.md) for exact file map, install steps, verification, and limits.
-
----
-
 ## License
 
 MIT — Original project: [9router](https://github.com/decolua/9router)
