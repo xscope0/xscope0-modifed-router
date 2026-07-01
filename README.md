@@ -181,8 +181,8 @@ npm pack
 **Requirements:** Node.js >= 18.0.0
 
 **Runtime deps** (auto-installed by `postinstall.js`):
-- `sql.js` / `better-sqlite3` → `~/.9router/runtime/node_modules`
-- `systray2` (macOS/Linux only) → `~/.9router/runtime/node_modules`
+- `sql.js` / `better-sqlite3` → `~/.xscope0/runtime/node_modules`
+- `systray2` (macOS/Linux only) → `~/.xscope0/runtime/node_modules`
 
 ---
 

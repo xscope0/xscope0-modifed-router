@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { UsageStats, RequestLogger, CardSkeleton, SegmentedControl } from "@/shared/components";
+import { CardSkeleton, SegmentedControl } from "@/shared/components";
 import KeiUsageView from "./components/KeiUsageView";
 import RequestDetailsTab from "./components/RequestDetailsTab";
 
@@ -27,7 +27,6 @@ function UsageContent() {
   const router = useRouter();
 
   const [period, setPeriod] = useState("today");
-  const [usageUi, setUsageUi] = useState("old");
 
   const tabFromUrl = searchParams.get("tab");
   const activeTab = tabFromUrl && ["overview", "logs", "details"].includes(tabFromUrl)
@@ -57,16 +56,6 @@ function UsageContent() {
         {activeTab === "overview" && (
           <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
             <SegmentedControl
-              options={[
-                { value: "old", label: "Old UI" },
-                { value: "new", label: "New UI" },
-              ]}
-              value={usageUi}
-              onChange={setUsageUi}
-              size="sm"
-              className="w-full sm:w-auto"
-            />
-            <SegmentedControl
               options={PERIODS}
               value={period}
               onChange={setPeriod}
@@ -79,14 +68,9 @@ function UsageContent() {
 
       {activeTab === "overview" && (
         <Suspense fallback={<CardSkeleton />}>
-          {usageUi === "new" ? (
-            <KeiUsageView period={period} />
-          ) : (
-            <UsageStats period={period} setPeriod={setPeriod} hidePeriodSelector />
-          )}
+          <KeiUsageView period={period} />
         </Suspense>
       )}
-      {activeTab === "logs" && <RequestLogger />}
       {activeTab === "details" && <RequestDetailsTab />}
     </div>
   );

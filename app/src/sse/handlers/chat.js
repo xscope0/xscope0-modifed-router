@@ -47,7 +47,18 @@ import { getProjectIdForConnection } from "open-sse/services/projectId.js";
 import { maybeWaitForCooldown, MAX_COOLDOWN_RETRIES } from "open-sse/utils/cooldownRetry.js";
 
 const KIRO_TEMP_SUSPEND_MS = 45 * 60 * 1000;
+const MAX_KIRO_TIMERS = 100;
 const kiroSuspendTimers = new Map();
+
+function pruneOldestKiroTimer() {
+  if (kiroSuspendTimers.size >= MAX_KIRO_TIMERS) {
+    const firstKey = kiroSuspendTimers.keys().next().value;
+    if (firstKey !== undefined) {
+      clearTimeout(kiroSuspendTimers.get(firstKey));
+      kiroSuspendTimers.delete(firstKey);
+    }
+  }
+}
 
 function isKiroTemporarySuspended(provider, error) {
   if (provider !== "kiro") return false;
@@ -64,6 +75,7 @@ async function suspendKiroTemporarily(connectionId) {
     catch (error) { log.error("AUTH", `Failed to reactivate Kiro account: ${error.message}`); }
     kiroSuspendTimers.delete(connectionId);
   }, KIRO_TEMP_SUSPEND_MS);
+  pruneOldestKiroTimer();
   kiroSuspendTimers.set(connectionId, timer);
 }
 
@@ -173,13 +185,13 @@ export async function handleChat(request, clientRawRequest = null) {
       return handleFusionChat({
         body,
         models: comboModels,
-        handleSingleModel: (b, m, isPanel) => {
+        handleSingleModel: (b, m, isPanel, externalSignal) => {
           let cleanRawReq = clientRawRequest;
           if (isPanel && clientRawRequest) {
             const { tools, tool_choice, ...cleanBody } = clientRawRequest.body || {};
             cleanRawReq = { ...clientRawRequest, body: cleanBody };
           }
-          return handleSingleModelChat(b, m, cleanRawReq, request, apiKey, apiKeyInfo);
+          return handleSingleModelChat(b, m, cleanRawReq, request, apiKey, apiKeyInfo, externalSignal);
         },
         log,
         comboName: modelStr,
@@ -208,7 +220,7 @@ export async function handleChat(request, clientRawRequest = null) {
 /**
  * Handle single model chat request
  */
-async function handleSingleModelChat(body, modelStr, clientRawRequest = null, request = null, apiKey = null, apiKeyInfo = null) {
+async function handleSingleModelChat(body, modelStr, clientRawRequest = null, request = null, apiKey = null, apiKeyInfo = null, externalSignal = null) {
   const modelInfo = await getModelInfo(modelStr);
 
   // If provider is null, this might be a combo name - check and handle
@@ -226,13 +238,13 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
         return handleFusionChat({
           body,
           models: comboModels,
-          handleSingleModel: (b, m, isPanel) => {
+          handleSingleModel: (b, m, isPanel, externalSignal) => {
             let cleanRawReq = clientRawRequest;
             if (isPanel && clientRawRequest) {
               const { tools, tool_choice, ...cleanBody } = clientRawRequest.body || {};
               cleanRawReq = { ...clientRawRequest, body: cleanBody };
             }
-            return handleSingleModelChat(b, m, cleanRawReq, request, apiKey, apiKeyInfo);
+            return handleSingleModelChat(b, m, cleanRawReq, request, apiKey, apiKeyInfo, externalSignal);
           },
           log,
           comboName: modelStr,
@@ -435,6 +447,7 @@ async function handleSingleModelChat(body, modelStr, clientRawRequest = null, re
       ponytailEnabled: chatSettings.ponytailEnabled === true,
       ponytailLevel: chatSettings.ponytailLevel || "full",
       providerThinking,
+      externalSignal,
       // Detect source format by endpoint + body
       sourceFormatOverride: request?.url ? detectFormatByEndpoint(new URL(request.url).pathname, body) : null,
       onCredentialsRefreshed: async (newCreds) => {
