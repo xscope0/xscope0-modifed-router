@@ -670,12 +670,12 @@ export default function ProxyPoolsPage() {
             ))}
           </select>
           <Button size="sm" variant="secondary" icon="health_and_safety" onClick={handleHealthCheck} disabled={healthChecking || bulkBusy}>
-            {healthChecking ? `SmartHealth ${healthProgress.current}/${healthProgress.total}` : "SmartHealth"}
+            {healthChecking ? `Checking ${healthProgress.current}/${healthProgress.total}` : "Check"}
           </Button>
           <Button size="sm" variant="secondary" icon="upload" onClick={openBatchImportModal}>
-            Batch Import
+            Import
           </Button>
-          <Button size="sm" icon="add" onClick={openCreateModal}>Add Proxy Pool</Button>
+          <Button size="sm" icon="add" onClick={openCreateModal}>Add</Button>
         </div>
       </div>
 
